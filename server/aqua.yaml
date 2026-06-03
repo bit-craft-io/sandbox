@@ -1,0 +1,10 @@
+# ref: https://github.com/aquaproj/aqua-registry/tree/main/pkgs
+registries:
+  - type: standard
+    ref: v4.264.0
+
+packages:
+  - name: protocolbuffers/protobuf/protoc@v35.0
+  - name: cloudspannerecosystem/wrench@v1.13.3
+  - name: grpc/grpc-go/protoc-gen-go-grpc@cmd/protoc-gen-go-grpc/v1.6.2
+  - name: protocolbuffers/protobuf-go/protoc-gen-go@v1.36.11

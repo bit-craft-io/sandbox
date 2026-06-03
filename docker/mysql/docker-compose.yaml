@@ -1,0 +1,22 @@
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${COMPOSE_PROJECT_NAME}
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.d:/docker-entrypoint-initdb.d
+    ports:
+      - '11306:3306'
+    privileged: true
+    networks:
+      - network-bc-sandbox
+volumes:
+  mysql_data:
+networks:
+  network-bc-sandbox:
+    driver: bridge

@@ -1,0 +1,4 @@
+.idea
+server/bin
+docker/teamcity/teamcity
+docker/youtrack/opt

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package health;
+
+option go_package = "gen/proto;proto";
+option php_namespace = "Proto\\Health";
+
+message ReqHealth {
+  string message = 1;
+  bool in_progress = 2;
+  int64 timestamp = 3;
+}
+
+message ResHealth {
+  bool is_success = 1;
+  string message = 2;
+}

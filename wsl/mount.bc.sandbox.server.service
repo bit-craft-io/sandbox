@@ -1,0 +1,12 @@
+# /etc/systemd/system/mount.bc.sandbox.server.service
+[Unit]
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/mkdir -p /mnt/wsl/bc.sandbox.server
+ExecStart=/usr/bin/mount --bind /var/www/bc.sandbox/server /mnt/wsl/bc.sandbox.server
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

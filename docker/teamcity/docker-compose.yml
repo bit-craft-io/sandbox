@@ -1,0 +1,49 @@
+services:
+  teamcity-server:
+    container_name: teamcity-server
+    image: jetbrains/teamcity-server:latest
+    user: "1000:1000"  # コンテナ内のtcuserと同じIDを指定
+    ports:
+      - '12111:8111'
+    volumes:
+      - teamcity_data:/data/teamcity_server/datadir
+      - teamcity_logs:/opt/teamcity/logs
+    environment:
+      - TEAMCITY_SERVER_MEM_OPTS=-Xmx4g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC
+    networks:
+      - network-bc-sandbox
+  teamcity-agent:
+    container_name: teamcity-agent
+    image: jetbrains/teamcity-agent:latest
+    depends_on:
+      - teamcity-server
+    environment:
+      - SERVER_URL=http://teamcity-server:8111
+    volumes:
+      - teamcity_agent:/data/teamcity_agent/conf
+    networks:
+      - network-bc-sandbox
+  teamcity-db:
+    container_name: teamcity-db
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${COMPOSE_PROJECT_NAME}
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - teamcity_data:/var/lib/mysql
+      - ./init.d:/docker-entrypoint-initdb.d
+    ports:
+      - '12306:3306'
+    privileged: true
+    networks:
+      - network-bc-sandbox
+volumes:
+  teamcity_agent:
+  teamcity_data:
+  teamcity_logs:
+  teamcity_db:
+networks:
+  network-bc-sandbox:
+    driver: bridge

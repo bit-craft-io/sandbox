@@ -1,0 +1,53 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# @note manifests内のyamlの名前空間の設定を変更
+namespace: dashboard
+
+resources:
+  - manifests/namespace/dashboard.yaml
+  - manifests/rbac/clusterrolebinding-admin.yaml
+  - manifests/rbac/serviceaccount-admin.yaml
+  - manifests/clusterrole.yaml
+  - manifests/clusterrolebinding.yaml
+  - manifests/configmap.yaml
+  - manifests/deployment.yaml
+  - manifests/role.yaml
+  - manifests/rolebinding.yaml
+  # @note certs で置き換え
+  #- manifests/secret.yaml
+  - manifests/service.yaml
+  - manifests/serviceaccount.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: kubernetes-dashboard-certs
+    namespace: kubernetes-dashboard
+    files:
+      - tls.crt=manifests/certs/dashboard.crt
+      - tls.key=manifests/certs/dashboard.key
+  - name: kubernetes-dashboard-csrf
+    namespace: kubernetes-dashboard
+
+# @note spec.template.spec.containers.args の namespace はこちらで変更
+patches:
+  - target:
+      kind: Deployment
+      name: kubernetes-dashboard
+    patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: kubernetes-dashboard
+      spec:
+        template:
+          spec:
+            containers:
+              - name: kubernetes-dashboard
+                args:
+                  - --namespace=dashboard
+                  - --enable-skip-login
+                  - --tls-cert-file=/tls.crt
+                  - --tls-key-file=/tls.key

@@ -1,0 +1,4 @@
+apiVersion: agones.dev/v1
+kind: Fleet
+metadata:
+  name: my-go-server

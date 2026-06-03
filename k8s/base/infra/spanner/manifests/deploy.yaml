@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spanner-emulator
+spec:
+  replicas: 1  # エミュレータは1つで十分や
+  selector:
+    matchLabels:
+      app: spanner-emulator
+  template:
+    metadata:
+      labels:
+        app: spanner-emulator
+    spec:
+      containers:
+        - name: emulator
+          image: gcr.io/cloud-spanner-used-proxy/cloud-spanner-emulator
+          ports:
+            - containerPort: 9010
+              name: grpc
+            - containerPort: 9020
+              name: rest
+          # 起動直後にインスタンスとDBを自動作成するなら、ここにライフサイクルフックや
+          # サイドカー、あるいはInitコンテナを組み合わせるのが一流や、シランケド。

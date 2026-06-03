@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../base/app/director
+
+labels:
+  - pairs:
+      env: local
+
+images:
+  - name: img-backend
+    newName: director
+    newTag: latest
+
+patches:
+  - target:
+      kind: Service
+      name: svc-director
+    patch: |
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: svc-director
+      spec:
+        ports:
+          - nodePort: 30091
+  - target:
+      kind: Deployment
+      name: deploy-director
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: deploy-director
+      spec:
+        template:
+          spec:
+            containers:
+              - name: director
+                imagePullPolicy: IfNotPresent
