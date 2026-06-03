@@ -1,25 +1,25 @@
-# prepare
+## 概要
+- 学習用の色々なお試しのリポジトリです。
 
-## env val
-_SANDBOX_DIR=/var/www/bc.sandbox
-
-## git clone
+## ディレクトリ構成
 ```
-cd /tmp
-git clone git@bc:bit-craft-io/sandbox.git bc.sandbox
-sudo mv bc.sandbox /var/www
-```
-
-# ops command
-## deploy K8s
-```
-cd $_SANDBOX_DIR/k8s
-
-```
-- http://localhost:30180/hello
-
-## build GS and apply K8s
-```
-cd $_SANDBOX_DIR/k8s
-
+root/                           # プロジェクト全体のルート（基盤管理・ツール管理の起点）
+├── docker/                     # 各種コンテナ定義（Spannerエミュレータ等）
+├── envs/                       # 共通環境変数（ローカル開発環境設定など）
+├── k8s/                        # K8s マニフェスト（kustomizeによる構成管理）
+│ ├── base/                     # 基底となる共通定義
+│ └── overlays/                 # 環境ごとの差分設定
+├── server/                     # アプリケーション実装領域（Go開発の主戦場）
+│ ├── cmd/                      # エントリポイント（アプリケーションの起動）
+│ ├── configs/                  # 設定ファイル群
+│ ├── gen/                      # 自動生成コード（Protobuf等）
+│ ├── internal/                 # 非公開のコアロジック
+│ ├── migrations/               # DBマイグレーションファイル
+│ ├── schema/                   # DBスキーマ定義（Spanner等）
+│ ├── Makefile                  # サービス個別の操作コマンド
+│ └── .env                      # サービス個別のローカル環境変数
+├── wsl/                        # WSL固有の設定やスクリプト
+├── Makefile                    # プロジェクト全体の統合操作コマンド
+├── aqua.yaml                   # 全体で統一された開発ツールの管理設定
+└── .env                        # 全体共通のローカル環境変数
 ```
