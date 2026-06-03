@@ -29,11 +29,3 @@ go version
 | Wrench | マイグレーション作成 | make migrate-new NAME=add_dummy_table          |
 |        | マイグレーション取得 | make migrate-load                              |
 |        | マイグレーション実行 | make migrate-up                                |
-
-## build Game Saver (=GS)
-```
-go version
-cd /mnt/wsl/bc.sandbox.server
-go mod init gs
-docker build -t sample:latest .
-```

@@ -1,9 +1,11 @@
 ## 概要
-- 学習用の色々なお試しのリポジトリです。
-
+- 学習用のリポジトリです
+- This repository is a part of my professional portfolio, <br>
+demonstrating my learning process and technical skills in software development.
+ 
 ## ディレクトリ構成
 ```
-root/                           # プロジェクト全体のルート（基盤管理・ツール管理の起点）
+/                               # プロジェクト全体のルート（基盤管理・ツール管理の起点）
 ├── docker/                     # 各種コンテナ定義（Spannerエミュレータ等）
 ├── envs/                       # 共通環境変数（ローカル開発環境設定など）
 ├── k8s/                        # K8s マニフェスト（kustomizeによる構成管理）
@@ -23,3 +25,4 @@ root/                           # プロジェクト全体のルート（基盤�
 ├── aqua.yaml                   # 全体で統一された開発ツールの管理設定
 └── .env                        # 全体共通のローカル環境変数
 ```
+
