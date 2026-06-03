@@ -12,6 +12,28 @@ NAME ?= sandbox
 wizard:
 	go run ./cmd/wizard
 
+.PHONY: setup
+setup: install-aqua
+	@echo "----------------------------------------------------------------"
+	@echo ">>> SETUP COMPLETED"
+	@echo "----------------------------------------------------------------"
+
+.PHONY: install-aqua
+install-aqua:
+	@if command -v aqua > /dev/null; then \
+		echo "aqua is already installed."; \
+	else \
+		echo "Installing aqua..."; \
+		curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/v4.0.2/aqua-installer | bash; \
+if ! grep -q "AQUA_ROOT_DIR" ~/.bashrc; then \
+			echo "Adding aqua to ~/.bashrc..."; \
+			echo "# add $$(date +%Y.%m.%d) aqua" >> ~/.bashrc; \
+			echo 'export PATH=$${AQUA_ROOT_DIR:-$${XDG_DATA_HOME:-$$HOME/.local/share}/aquaproj-aqua}/bin:$$PATH' >> ~/.bashrc; \
+			echo "Please run 'source ~/.bashrc' to reflect the changes."; \
+		fi \
+	fi
+	aqua install
+
 # ========================================
 #  GoLang
 # ----------------------------------------
