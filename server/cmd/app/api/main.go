@@ -1,17 +1,19 @@
 package main
 
 import (
-	"bit-craft/gen/gorm/model"
+	pb "bit-craft/gen/proto/go"
 	"bit-craft/internal/core"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
 	"github.com/go-chi/chi/v5"
 	spannergorm "github.com/googleapis/go-gorm-spanner"
 	_ "github.com/googleapis/go-sql-spanner"
+	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 )
 
@@ -25,12 +27,6 @@ func main() {
 	log.Printf("DATABASE=%s", os.Getenv("SPANNER_DATABASE_ID"))
 	log.Printf("EMULATOR=%s", os.Getenv("SPANNER_EMULATOR_HOST"))
 	log.Println("----------------------")
-
-	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		uuid := core.GenUuid()
-		_, _ = w.Write([]byte("api ok " + uuid))
-	})
 
 	dsn := fmt.Sprintf(
 		"projects/%s/instances/%s/databases/%s",
@@ -47,30 +43,66 @@ func main() {
 	log.Println("----------------------")
 
 	router := chi.NewRouter()
-	router.Method("Get, Post", "/access", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		newRecord := &model.HAccess{
-			ID:       core.GenUuid(),
-			PublicID: "",
-			Info:     "{}",
+
+	router.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		uuid := core.GenUuid()
+		_, _ = w.Write([]byte("api ok " + uuid))
+	})
+
+	router.Get("/access", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("RemoteAddr: %s", r.RemoteAddr)
+		log.Println("get access")
+	})
+
+	//router.Post("/access", func(w http.ResponseWriter, r *http.Request) {
+	//	log.Printf("RemoteAddr: %s", r.RemoteAddr)
+	//	newRecord := &model.HAccess{
+	//		ID:       core.GenUuid(),
+	//		PublicID: "",
+	//		Info:     "{}",
+	//	}
+	//	if err := db.Create(newRecord).Error; err != nil {
+	//		http.Error(w, err.Error(), http.StatusInternalServerError)
+	//		return
+	//	}
+	//
+	//	res := map[string]interface{}{
+	//		"status": "created",
+	//		"id":     newRecord.ID,
+	//	}
+	//	jsonData, _ := json.Marshal(res)
+	//	w.Header().Set("Content-Type", "application/json")
+	//	w.WriteHeader(http.StatusCreated)
+	//	_, _ = w.Write(jsonData)
+	//})
+
+	router.Post("/access", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/x-protobuf")
+		id := core.GenUuid()
+		msg := map[string]interface{}{
+			"status": "created",
+			"id":     id,
 		}
-		if err := db.Create(newRecord).Error; err != nil {
+		bytes, err := json.Marshal(msg)
+		res := &pb.ResAccess{
+			IsSuccess: true,
+			Message:   string(bytes),
+		}
+		data, err := proto.Marshal(res)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		res := map[string]interface{}{
-			"status": "created",
-			"id":     newRecord.ID,
-		}
-		jsonData, _ := json.Marshal(res)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		_, _ = w.Write(jsonData)
-	}))
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(data)
+	})
 
 	// @note main が停止しないように待ち受け
 	log.Println("Server listening on :8080")
-	if err := http.ListenAndServe(":8080", router); err != nil {
+	ln, err := net.Listen("tcp4", ":8080")
+	if err != nil {
 		log.Fatal(err)
 	}
+	log.Fatal((&http.Server{Handler: router}).Serve(ln))
 }
