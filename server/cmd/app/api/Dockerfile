@@ -1,5 +1,5 @@
 # @note バイナリ作成
-FROM golang:1.26-alpine AS builder
+FROM golang:alpine3.23 AS builder
 
 RUN apk add --no-cache git
 

@@ -39,6 +39,8 @@ if ! grep -q "AQUA_ROOT_DIR" ~/.bashrc; then \
 # ----------------------------------------
 .PHONY: build
 build:
+	@mkdir -p bin
+	@rm -f bin/$(NAME)
 	@echo "Building $(DIR)..."
 	go build -o bin/$(NAME) ./$(DIR)
 
