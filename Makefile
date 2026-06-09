@@ -14,9 +14,9 @@ KUSTOMIZE_YML_APP   := k8s/overlays/$(DIR_ENV)/$(APP)
 KUSTOMIZE_YML_INFRA := k8s/overlays/$(DIR_ENV)/infra
 LIST_KUBE_TARGET    := bit-craft agones api director openmatch game
 
-#==============================
+# ========================================
 # command result check
-#------------------------------
+# ----------------------------------------
 CLR_GREEN   := \033[32m
 CLR_RED     := \033[31m
 CLR_YELLOW  := \033[33m
@@ -27,8 +27,10 @@ define check_result
 	&&   echo "$(CLR_GREEN)  SUCCESS: $@$(CLR_RESET)" \
 	|| { echo "$(CLR_RED)  FAILED: $@$(CLR_RESET)"; exit 1; }
 endef
-#==============================
 
+# ========================================
+# command k8s
+# ----------------------------------------
 .PHONY: check-export
 check-export:
 	@echo "----------------------------------------------------------------"
