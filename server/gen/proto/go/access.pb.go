@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.35.0
-// source: hallo.proto
+// source: access.proto
 
 package proto
 
@@ -21,27 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ReqHallo struct {
+type ReqAccess struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReqHallo) Reset() {
-	*x = ReqHallo{}
-	mi := &file_hallo_proto_msgTypes[0]
+func (x *ReqAccess) Reset() {
+	*x = ReqAccess{}
+	mi := &file_access_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReqHallo) String() string {
+func (x *ReqAccess) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReqHallo) ProtoMessage() {}
+func (*ReqAccess) ProtoMessage() {}
 
-func (x *ReqHallo) ProtoReflect() protoreflect.Message {
-	mi := &file_hallo_proto_msgTypes[0]
+func (x *ReqAccess) ProtoReflect() protoreflect.Message {
+	mi := &file_access_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -52,12 +52,12 @@ func (x *ReqHallo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReqHallo.ProtoReflect.Descriptor instead.
-func (*ReqHallo) Descriptor() ([]byte, []int) {
-	return file_hallo_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use ReqAccess.ProtoReflect.Descriptor instead.
+func (*ReqAccess) Descriptor() ([]byte, []int) {
+	return file_access_proto_rawDescGZIP(), []int{0}
 }
 
-type ResHallo struct {
+type ResAccess struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	IsSuccess     bool                   `protobuf:"varint,1,opt,name=is_success,json=isSuccess,proto3" json:"is_success,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
@@ -65,21 +65,21 @@ type ResHallo struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ResHallo) Reset() {
-	*x = ResHallo{}
-	mi := &file_hallo_proto_msgTypes[1]
+func (x *ResAccess) Reset() {
+	*x = ResAccess{}
+	mi := &file_access_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ResHallo) String() string {
+func (x *ResAccess) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ResHallo) ProtoMessage() {}
+func (*ResAccess) ProtoMessage() {}
 
-func (x *ResHallo) ProtoReflect() protoreflect.Message {
-	mi := &file_hallo_proto_msgTypes[1]
+func (x *ResAccess) ProtoReflect() protoreflect.Message {
+	mi := &file_access_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -90,55 +90,54 @@ func (x *ResHallo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ResHallo.ProtoReflect.Descriptor instead.
-func (*ResHallo) Descriptor() ([]byte, []int) {
-	return file_hallo_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use ResAccess.ProtoReflect.Descriptor instead.
+func (*ResAccess) Descriptor() ([]byte, []int) {
+	return file_access_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ResHallo) GetIsSuccess() bool {
+func (x *ResAccess) GetIsSuccess() bool {
 	if x != nil {
 		return x.IsSuccess
 	}
 	return false
 }
 
-func (x *ResHallo) GetMessage() string {
+func (x *ResAccess) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
 }
 
-var File_hallo_proto protoreflect.FileDescriptor
+var File_access_proto protoreflect.FileDescriptor
 
-const file_hallo_proto_rawDesc = "" +
+const file_access_proto_rawDesc = "" +
 	"\n" +
-	"\vhallo.proto\x12\x05hallo\"\n" +
-	"\n" +
-	"\bReqHallo\"C\n" +
-	"\bResHallo\x12\x1d\n" +
+	"\faccess.proto\x12\x06access\"\v\n" +
+	"\tReqAccess\"D\n" +
+	"\tResAccess\x12\x1d\n" +
 	"\n" +
 	"is_success\x18\x01 \x01(\bR\tisSuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessageB\x1fZ\x0fgen/proto;proto\xca\x02\vProto\\Hallob\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessageB Z\x0fgen/proto;proto\xca\x02\fProto\\Accessb\x06proto3"
 
 var (
-	file_hallo_proto_rawDescOnce sync.Once
-	file_hallo_proto_rawDescData []byte
+	file_access_proto_rawDescOnce sync.Once
+	file_access_proto_rawDescData []byte
 )
 
-func file_hallo_proto_rawDescGZIP() []byte {
-	file_hallo_proto_rawDescOnce.Do(func() {
-		file_hallo_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_hallo_proto_rawDesc), len(file_hallo_proto_rawDesc)))
+func file_access_proto_rawDescGZIP() []byte {
+	file_access_proto_rawDescOnce.Do(func() {
+		file_access_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_access_proto_rawDesc), len(file_access_proto_rawDesc)))
 	})
-	return file_hallo_proto_rawDescData
+	return file_access_proto_rawDescData
 }
 
-var file_hallo_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_hallo_proto_goTypes = []any{
-	(*ReqHallo)(nil), // 0: hallo.ReqHallo
-	(*ResHallo)(nil), // 1: hallo.ResHallo
+var file_access_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_access_proto_goTypes = []any{
+	(*ReqAccess)(nil), // 0: access.ReqAccess
+	(*ResAccess)(nil), // 1: access.ResAccess
 }
-var file_hallo_proto_depIdxs = []int32{
+var file_access_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -146,26 +145,26 @@ var file_hallo_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_hallo_proto_init() }
-func file_hallo_proto_init() {
-	if File_hallo_proto != nil {
+func init() { file_access_proto_init() }
+func file_access_proto_init() {
+	if File_access_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_hallo_proto_rawDesc), len(file_hallo_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_access_proto_rawDesc), len(file_access_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_hallo_proto_goTypes,
-		DependencyIndexes: file_hallo_proto_depIdxs,
-		MessageInfos:      file_hallo_proto_msgTypes,
+		GoTypes:           file_access_proto_goTypes,
+		DependencyIndexes: file_access_proto_depIdxs,
+		MessageInfos:      file_access_proto_msgTypes,
 	}.Build()
-	File_hallo_proto = out.File
-	file_hallo_proto_goTypes = nil
-	file_hallo_proto_depIdxs = nil
+	File_access_proto = out.File
+	file_access_proto_goTypes = nil
+	file_access_proto_depIdxs = nil
 }
