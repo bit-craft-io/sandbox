@@ -1,5 +1,8 @@
+## 概要
+- Go 学習用
+
 ## インストール
-- go lang
+- Go
 ```
 cd /tmp
 wget https://go.dev/dl/go1.26.3.linux-amd64.tar.gz
