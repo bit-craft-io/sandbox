@@ -15,3 +15,21 @@ sudo systemctl restart mount.bc.sandbox.server.service
 sudo systemctl start mount.bc.sandbox.server.service
 sudo systemctl stop mount.bc.sandbox.server.service
 ```
+
+### ex1. Ollama を動作
+```
+# インストール
+curl -fsSL https://ollama.com/install.sh | sh
+systemctl status ollama
+
+# LLM確認
+https://ollama.com/library
+
+# LLM取得
+ollama pull gemma4:12b
+ollama list
+
+# LLM設定
+ollama run gemma4:12b
+ollama ps
+```

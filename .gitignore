@@ -2,3 +2,6 @@
 server/bin
 docker/teamcity/teamcity
 docker/youtrack/opt
+ai/.venv
+ai/.envrc
+ai/rag/.history
