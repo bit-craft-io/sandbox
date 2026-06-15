@@ -3,5 +3,5 @@ services:
     container_name: plantuml
     image: plantuml/plantuml-server:jetty
     ports:
-      - "12080:8080"
+      - "8080:8080"
     restart: always
