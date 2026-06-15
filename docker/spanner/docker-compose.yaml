@@ -19,7 +19,7 @@ services:
       - SPANNER_EMULATOR_HOST=spanner:9010
     volumes:
       - ./init.sh:/init.sh
-    command: /bin/bash /init.sh
+    entrypoint: ["/bin/bash", "/init.sh"]
     restart: "no"
 volumes:
   spanner_data:
