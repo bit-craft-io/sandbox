@@ -1,0 +1,38 @@
+services:
+  spanner-omni:
+    image: ${__CONTAINER_IMAGE}
+    container_name: spanner-omni
+    ports:
+      - "15000-15026:15000-15026"
+    volumes:
+      - spanner-omni:/spanner
+    command: start-single-server
+    restart: unless-stopped
+    networks:
+      - spanner-network
+    healthcheck:
+      test: ["CMD", "/google/spanner/bin/spanner", "databases", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  spanner-omni-init:
+    image: ${__CONTAINER_IMAGE}
+    container_name: spanner-omni-init
+    depends_on:
+      spanner-omni:
+        condition: service_healthy
+    volumes:
+      - ./init.sh:/init.sh
+    entrypoint: ["/bin/sh", "/init.sh"]
+    restart: "no"
+    networks:
+      - spanner-network
+
+volumes:
+  spanner-omni:
+
+networks:
+  spanner-network:
+    driver: bridge
