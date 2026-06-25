@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bit-craft/gen/gorm/model"
 	pb "bit-craft/gen/proto/go"
 	"bit-craft/internal/core"
 	"encoding/json"
@@ -39,7 +40,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("----------------------")
-	fmt.Println(db)
+	log.Println(db)
 	log.Println("----------------------")
 
 	router := chi.NewRouter()
@@ -52,40 +53,38 @@ func main() {
 
 	router.Get("/access", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("RemoteAddr: %s", r.RemoteAddr)
-		log.Println("get access")
+		_, _ = w.Write([]byte("api: access ok"))
 	})
 
-	//router.Post("/access", func(w http.ResponseWriter, r *http.Request) {
-	//	log.Printf("RemoteAddr: %s", r.RemoteAddr)
-	//	newRecord := &model.HAccess{
-	//		ID:       core.GenUuid(),
-	//		PublicID: "",
-	//		Info:     "{}",
-	//	}
-	//	if err := db.Create(newRecord).Error; err != nil {
-	//		http.Error(w, err.Error(), http.StatusInternalServerError)
-	//		return
-	//	}
-	//
-	//	res := map[string]interface{}{
-	//		"status": "created",
-	//		"id":     newRecord.ID,
-	//	}
-	//	jsonData, _ := json.Marshal(res)
-	//	w.Header().Set("Content-Type", "application/json")
-	//	w.WriteHeader(http.StatusCreated)
-	//	_, _ = w.Write(jsonData)
-	//})
-
 	router.Post("/access", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/x-protobuf")
-		id := core.GenUuid()
-		msg := map[string]interface{}{
+		log.Printf("RemoteAddr: %s", r.RemoteAddr)
+		newRecord := &model.HAccess{
+			ID:       core.GenUuid(),
+			PublicID: "",
+			Info:     "{}",
+		}
+		if err := db.Create(newRecord).Error; err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		res := map[string]interface{}{
 			"status": "created",
-			"id":     id,
+			"id":     newRecord.ID,
+		}
+		jsonData, _ := json.Marshal(res)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_, _ = w.Write(jsonData)
+	})
+
+	router.Post("/dummy", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/x-protobuf")
+		msg := map[string]interface{}{
+			"status": "ok",
 		}
 		bytes, err := json.Marshal(msg)
-		res := &pb.ResAccess{
+		res := &pb.ResDummy{
 			IsSuccess: true,
 			Message:   string(bytes),
 		}

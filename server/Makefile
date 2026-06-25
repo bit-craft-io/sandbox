@@ -1,8 +1,3 @@
-ifneq (,$(wildcard .env))
-    include .env
-    export $(shell sed 's/=.*//' .env)
-endif
-
 EXEC_DATE_STR=$$(date '+%Y/%m/%d %H:%M:%S')
 
 DIR  ?= cmd/sandbox
@@ -47,7 +42,7 @@ build:
 .PHONY: run
 run:
 	@echo "Running bin/$(NAME)..."
-	./bin/$(NAME)
+	@set -a && . $(DIR)/.env && set +a && ./bin/$(NAME)
 
 # ========================================
 #  GoLang module

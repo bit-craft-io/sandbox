@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package dummy;
+
+option go_package = "gen/proto;proto";
+option php_namespace = "Proto\\Dummy";
+
+message ReqDummy {
+  // dummy
+  int32 type = 1;
+}
+
+message ResDummy {
+  // dummy
+  bool is_success = 1;
+  string message = 2;
+}
