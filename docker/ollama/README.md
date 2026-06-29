@@ -3,6 +3,7 @@
 
 ## 準備
 - Ollama
+  - wsl で起動 
 ```
 sudo apt-get install zstd
 curl -fsSL https://ollama.com/install.sh | sh

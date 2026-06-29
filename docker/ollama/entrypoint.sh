@@ -1,12 +1,5 @@
 #!/bin/sh
 
-mkdir -p /root/.ollama
-
-echo "--- Copying from WSL (~/.ollama) to Container (/root/.ollama) ---"
-cp -a /mnt/wsl_ollama/. /root/.ollama/
-
-chown -R root:root /root/.ollama
-
 /bin/ollama serve &
 
 sleep 2
