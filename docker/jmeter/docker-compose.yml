@@ -1,0 +1,51 @@
+services:
+  master:
+    image: justb4/jmeter:5.5
+    container_name: master
+    environment:
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./config/master.sh:/etc/profile.d/master.sh:ro
+      - ./config/jmeter.properties:/opt/apache-jmeter-5.5/bin/jmeter.properties:ro
+      - ./tests:/tmp/tests
+      - ./output:/tmp/output
+    # command: 
+    ports:
+      - 50000:50000
+    depends_on:
+      - slave1
+      - slave2
+    networks:
+      - jmeter-net
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+  slave1:
+    image: justb4/jmeter:5.5
+    container_name: slave1
+    environment:
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./config/jmeter.properties:/opt/apache-jmeter-5.5/bin/jmeter.properties:ro
+    command: ["-s"]
+    ports:
+      - 50001:50000
+    networks:
+      - jmeter-net
+
+  # ここを増やしたときは jmeter.properties にも追加する
+  slave2:
+    image: justb4/jmeter:5.5
+    container_name: slave2
+    environment:
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./config/jmeter.properties:/opt/apache-jmeter-5.5/bin/jmeter.properties:ro
+    command: ["-s"]
+    ports:
+      - 50002:50000
+    networks:
+      - jmeter-net
+
+networks:
+  jmeter-net:
+    driver: bridge
