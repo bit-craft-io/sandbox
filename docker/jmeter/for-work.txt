@@ -1,0 +1,45 @@
+# 起動中コンテナに対し実行コマンドを送信（コンテナ内で master.sh を実行している）
+docker-compose -p jmeter exec master bash --login -c run
+
+# コンテナ起動（=実行）
+rm -rf /mnt/d/self/projects/jmeter/output/*
+docker-compose run --rm master
+
+# ログインして確認
+docker-compose exec master bash --login
+exit
+docker-compose exec slave2 bash --login
+ps aux | grep jmeter-server
+exit
+
+ls -l /opt/apache-jmeter-5.5/bin/jmeter
+
+
+/opt/apache-jmeter-5.5/bin/jmeter -n -t /tests/test-plan.jmx -l /output/result.jtl -e -o /output/report -r
+
+cd ~
+cp -a /opt/apache-jmeter-5.5/bin/jmeter ./jmeter
+cp -a /tests/test-plan.jmx ./test-plan.jmx
+cp -a /output/result.jtl ./result.jtl
+cp -a /output/report ./report
+ls -l
+
+# コマンドが通る
+/opt/apache-jmeter-5.5/bin/jmeter -n -t test-plan.jmx -l result.jtl -e -o report
+rm result.jtl
+mkdir report
+
+vi /opt/apache-jmeter-5.5/bin/jmeter.properties
+
+/opt/apache-jmeter-5.5/bin/jmeter -n -t /root/tests/test-plan.jmx -l /root/output/result.jtl -e -o /root/output/report -r
+ls -al /root/output/*
+rm -rf /root/output/*
+
+docker-compose exec slave1 bash --login
+ps aux | grep jmeter-server
+
+vi /opt/apache-jmeter-5.5/bin/jmeter.properties
+
+docker-compose rm -sf slave1
+docker-compose up -d --no-deps --build slave1
+exit

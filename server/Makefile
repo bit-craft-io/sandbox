@@ -67,9 +67,6 @@ get:
 	@echo "example: make get gorm.io/gorm"
 	@exit 1
 endif
-# magic
-%:
-	@:
 
 .PHONY: tidy
 tidy:
@@ -202,3 +199,9 @@ endif
 #	@atlas migrate apply \
 #		--dir file://$(MIGRATION_DIR) \
 #		--url $(DB_URL)
+
+# 必須のおまじない
+#%:
+#	@:
+.DEFAULT:
+	@echo "--- [WARN] target '$@' unknown ---"
