@@ -1,3 +1,7 @@
+.PHONY: restart
+restart:
+	docker compose restart
+
 .PHONY: up
 up:
 	docker compose up -d
