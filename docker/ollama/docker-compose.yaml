@@ -8,7 +8,8 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       - OLLAMA_API_BASE=http://host.docker.internal:11434
-    command: --model ollama/${__OLLAMA_MODEL} --alias ${__OLLAMA_MODEL} --port 4000
+    #command: --model ollama/${__OLLAMA_MODEL} --alias ${__OLLAMA_MODEL} --port 4000
+    command: --model ollama_chat/${__OLLAMA_MODEL} --alias ${__OLLAMA_MODEL} --port 4000
     restart: always
     networks:
       - ollama-net
@@ -43,15 +44,21 @@ services:
       - OPENAI_API_BASE_URL=http://proxy:4000
       - OPENAI_API_KEY=dummy
       - DEFAULT_MODELS=${__OLLAMA_MODEL}
-      - WEBUI_AUTH=false
-      #  
+      # admin settings（Falseは大文字、WebUIが文字列で判断している模様（バグ））
+      - WEBUI_AUTH=False
+      - WEBUI_SECRET_KEY=any_random_string
+      # comfyui settings
       - ENABLE_IMAGE_GENERATION=true
       - COMFYUI_BASE_URL=http://comfyui:8188
       - IMAGE_GENERATION_ENGINE=comfyui
+      #- COMFYUI_WORKFLOW_FILE=/app/backend/comfyui_workflow.json
+      ## local cache only
+      - HF_HUB_OFFLINE=1
     depends_on:
       - proxy
     volumes:
       - open-webui:/app/backend/data
+      #- ./comfyui-workflow.json:/app/backend/comfyui_workflow.json
     restart: always
     networks:
       - ollama-net
@@ -62,8 +69,10 @@ services:
       - "8188:8188"
       - "1111:1111"
     environment:
+      - WEB_ENABLE_AUTH=false
       - WEB_USER=guest
       - WEB_PASSWORD=guest
+      - COMFYUI_SD_MODEL_NAME=${__COMFY_UI_MODEL}
     volumes:
       - ~/.comfyui/models:/opt/ComfyUI/models
     deploy:
