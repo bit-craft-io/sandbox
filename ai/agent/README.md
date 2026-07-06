@@ -26,7 +26,6 @@ nano /mnt/c/Users/$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')/.wslc
 ```
 [wsl2]
 guiApplications=true
-audio=true
 ```
 ```
 ctrl+X, Enter

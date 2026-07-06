@@ -1,5 +1,6 @@
 import os
 import requests
+import time
 
 BASE_URL = "http://localhost:8123"
 USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("true", "1", "yes")
@@ -53,7 +54,13 @@ def test_string_input():
             }
         }
 
+        start_time = time.time()
+
         run_res = requests.post(f"{BASE_URL}/threads/{thread_id}/runs/wait", json=payload)
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+
         if not run_res.ok:
             print(f"[-] Status: {run_res.status_code}")
             print(f"[-] Response body: {run_res.text}")  # Response内容
@@ -63,6 +70,8 @@ def test_string_input():
         print("\n--- [RAW BACKEND RESPONSE] ---")
         print(final_state)
         print("-------------------------------\n")
+
+        print(f"[METRIC] execution_time={elapsed_time:.4f}s")
 
         # 4. Parse payload state dynamically
         print("[*] 4/4: Resolving output message layers...")
