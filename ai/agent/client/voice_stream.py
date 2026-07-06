@@ -170,7 +170,8 @@ def test_voice_input():
         try:
             audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
             print("[*] Processing audio stream via Google STT...")
-            user_text = "ファミコンの名作を教えて。あと、返信の文にアスタリスクとかの記号は不要"
+            #user_text = "ファミコンの名作を教えて。あと、返信の文にアスタリスクとかの記号は不要"
+            user_text = recognizer.recognize_google(audio, language="ja-JP")
             print(f"[Recognized Text Input]: {user_text}")
         except sr.WaitTimeoutError:
             print("[-] Error: Audio input timeout. No speech detected.")

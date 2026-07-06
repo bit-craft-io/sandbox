@@ -35,7 +35,7 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - ~/.ollama:/root/.ollama:ro
+      - ~/.ollama:/root/.ollama
       - ./ollama/entrypoint.sh:/entrypoint.sh
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
     deploy:

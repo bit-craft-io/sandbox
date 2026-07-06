@@ -2,6 +2,7 @@
 server/bin
 docker/teamcity/teamcity
 docker/youtrack/opt
-ai/.venv
+ai/agent/.venv
+ai/agent/server/langgraph/.langgraph_api
 ai/.envrc
 ai/rag/.history

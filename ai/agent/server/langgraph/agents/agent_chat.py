@@ -18,6 +18,7 @@ def chatbot(state: MessagesState, config: RunnableConfig):
             base_url="http://ollama-proxy:4000",
             api_key="dummy",
             model="gemma4:e2b",
+            streaming=True
         )
         response = llm.invoke(state["messages"])
         return {"messages": [response]}
