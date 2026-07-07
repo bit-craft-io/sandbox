@@ -1,13 +1,16 @@
+import asyncio
 import os
 import requests
 import time
+from utils.input_timer import InputTimer
 
 BASE_URL = "http://localhost:8123"
 USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("true", "1", "yes")
 
-def test_string_input():
+async def test_string_input():
     print("\n================================================================================")
-    user_text = input("[Request] Enter payload for agent : ") or "is test."
+    # user_text = input("[Request] Enter payload for agent : ") or "is test."
+    user_text = await InputTimer.ask("[Request] Enter payload for agent : ", timeout=20)
     print("================================================================================\n")
 
     try:
@@ -56,7 +59,10 @@ def test_string_input():
 
         start_time = time.time()
 
-        run_res = requests.post(f"{BASE_URL}/threads/{thread_id}/runs/wait", json=payload)
+        run_res = requests.post(
+            f"{BASE_URL}/threads/{thread_id}/runs/wait",
+            json=payload,
+        )
 
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -94,4 +100,4 @@ def test_string_input():
         print(f"\n[-] Runtime Exception: Unexpected failure occurred: {e}")
 
 if __name__ == "__main__":
-    test_string_input()
+    asyncio.run(test_string_input())
