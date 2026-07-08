@@ -12,16 +12,32 @@ def chatbot(state: MessagesState, config: RunnableConfig):
 
     #print(f"[DEBUG] use_llm value: {use_llm} (type: {type(use_llm)})", flush=True)
 
+    # if use_llm:
+    #     # TODO: model 直打ち
+    #     llm = ChatOpenAI(
+    #         base_url="http://ollama-proxy:4000",
+    #         api_key="dummy",
+    #         model="gemma4:e2b",
+    #         streaming=True
+    #     )
+    #     response = llm.invoke(state["messages"])
+    #     return {"messages": [response]}
+
     if use_llm:
-        # TODO: model 直打ち
+        print("[DEBUG] LLM Invoke Started...", flush=True)
         llm = ChatOpenAI(
             base_url="http://ollama-proxy:4000",
             api_key="dummy",
             model="gemma4:e2b",
             streaming=True
         )
-        response = llm.invoke(state["messages"])
-        return {"messages": [response]}
+        try:
+            response = llm.invoke(state["messages"])
+            print(f"[DEBUG] LLM Response Raw: {response}", flush=True)
+            return {"messages": [response]}
+        except Exception as e:
+            print(f"[DEBUG] LLM Invoke FAILED: {str(e)}", flush=True)
+            raise e
 
     current_time = datetime.now(JST).strftime("%Y/%m/%d %H:%M:%S")
     return {"messages": [{"role": "assistant", "content": f"Chat Health Check OK ({current_time})"}]}

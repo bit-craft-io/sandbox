@@ -8,10 +8,17 @@ import pygame
 import requests
 import speech_recognition as sr
 
+from utils.suppress_stderr import SuppressStderr
+
 BASE_URL = "http://localhost:8123"
 USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("true", "1", "yes")
 
-pygame.mixer.init()  # モジュールレベルで1回だけ
+if not pygame.mixer.get_init():
+    try:
+        with SuppressStderr():
+            pygame.mixer.init()
+    except pygame.error:
+        print("[!] Audio device unavailable. Playback disabled.")
 
 def init_tts():
     return None
@@ -46,6 +53,7 @@ def speak_text(engine, text):
     """従来通りの単発呼び出し用(互換性維持)"""
     if not text.strip():
         return
+
     print(f"[Output Stream - Audio Playing] {text}")
     play_audio_bytes(synthesize(text))
 
@@ -84,7 +92,6 @@ class SpeechPipeline:
                 break
             print("[Output Stream - Audio Playing]")
             play_audio_bytes(audio_bytes)
-
 
 def run_and_speak_stream(thread_id, real_assistant_id, user_text, use_llm):
     payload = {
@@ -162,26 +169,27 @@ def test_voice_input():
     print("================================================================================\n")
 
     user_text = ""
-    with sr.Microphone() as source:
-        print("[*] Adjusting for ambient noise... Please wait.")
-        recognizer.adjust_for_ambient_noise(source, duration=1)
-        print("[Input stream opened] Speak your payload now...")
+    with SuppressStderr():
+        with sr.Microphone() as source:
+            print("[*] Adjusting for ambient noise... Please wait.")
+            recognizer.adjust_for_ambient_noise(source, duration=1)
+            print("[Input stream opened] Speak your payload now...")
 
-        try:
-            audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
-            print("[*] Processing audio stream via Google STT...")
-            #user_text = "ファミコンの名作を教えて。あと、返信の文にアスタリスクとかの記号は不要"
-            user_text = recognizer.recognize_google(audio, language="ja-JP")
-            print(f"[Recognized Text Input]: {user_text}")
-        except sr.WaitTimeoutError:
-            print("[-] Error: Audio input timeout. No speech detected.")
-            return
-        except sr.UnknownValueError:
-            print("[-] Error: Google STT could not understand the audio.")
-            return
-        except Exception as e:
-            print(f"[-] Error during STT processing: {e}")
-            return
+            try:
+                audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
+                print("[*] Processing audio stream via Google STT...")
+                #user_text = "ファミコンの名作を教えて。あと、返信の文にアスタリスクとかの記号は不要"
+                user_text = recognizer.recognize_google(audio, language="ja-JP")
+                print(f"[Recognized Text Input]: {user_text}")
+            except sr.WaitTimeoutError:
+                print("[-] Error: Audio input timeout. No speech detected.")
+                return
+            except sr.UnknownValueError:
+                print("[-] Error: Google STT could not understand the audio.")
+                return
+            except Exception as e:
+                print(f"[-] Error during STT processing: {e}")
+                return
 
     try:
         print("[*] 1/4: Searching for available assistant deployment...")
@@ -205,7 +213,8 @@ def test_voice_input():
 
         print("[*] 3/4: Streaming agent runtime flow, speaking sentence by sentence...")
         print("\n================================================================================")
-        full_response = run_and_speak_stream(thread_id, real_assistant_id, user_text, USE_LLM)
+        with SuppressStderr():
+            full_response = run_and_speak_stream(thread_id, real_assistant_id, user_text, USE_LLM)
         print("================================================================================\n")
 
         print("[*] 4/4: Done.")
@@ -215,7 +224,6 @@ def test_voice_input():
         print(f"\n[-] Network Error: Failed to reach backend service at {BASE_URL}.")
     except Exception as e:
         print(f"\n[-] Runtime Exception: Unexpected failure occurred: {e}")
-
 
 if __name__ == "__main__":
     test_voice_input()

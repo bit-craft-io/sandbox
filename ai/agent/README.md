@@ -49,6 +49,9 @@ pip install pygame
 
 # LangGraph のライブラリ
 pip install langgraph langchain-core langchain-openai
+
+# CUI のライブラリ
+pip install inquirerpy readchar
 ```
 
 ### 疎通確認

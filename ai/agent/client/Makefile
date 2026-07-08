@@ -1,5 +1,8 @@
 include ../Makefile
-include .env
+
+.PHONY: cli-menu
+cli-menu:
+	. ../.venv/bin/activate && python3 menu.py
 
 .PHONY: cli-health
 cli-health:
@@ -13,3 +16,4 @@ cli-chat:
 .PHONY: cli-voice
 cli-voice:
 	USE_LLM=true python3 voice_stream.py
+
