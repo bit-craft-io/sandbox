@@ -5,6 +5,11 @@ export OLLAMA_MODELS = $(HOME)/.ollama/models
 export COMFY_MODELS = $(HOME)/.comfyui/models
 #export SDXL_URL = https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/$(__COMFY_UI_MODEL)
 
+TASKS += \
+	srv-setup \
+	srv-info \
+	srv-clean
+
 .PHONY: srv-setup
 srv-setup:
 	@echo "--- Install Ollama ---"
