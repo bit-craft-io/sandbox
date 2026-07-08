@@ -5,32 +5,84 @@ services:
       - "50021:50021"
     networks:
       - ollama-net
-  langgraph-api:
-    build:
-      context: ./langgraph
-      dockerfile: Dockerfile
-    container_name: langgraph-api
+#  langgraph-api:
+#    build:
+#      context: ./langgraph
+#      dockerfile: Dockerfile
+#    container_name: langgraph-api
+#    ports:
+#      - "8123:8123"
+#    environment:
+#      - LANGCHAIN_TRACING_V2=false
+#      - LANGGRAPH_DATABASE_URL=sqlite:////app/data/langgraph.db
+#      # agent 毎に使用変数が異なる
+#      - OPENAI_API_KEY=${__OPENAI_API_KEY}
+#      - GEMINI_API_KEY=${__GEMINI_API_KEY}
+#      - ANTHROPIC_API_KEY=${__ANTHROPIC_API_KEY}
+#      - LANGCHAIN_API_KEY=${__LANGCHAIN_API_KEY}
+#      - LANGSMITH_API_KEY=${__LANGSMITH_API_KEY}
+#    volumes:
+#      - ./langgraph:/app
+#      - langgraph-data:/app/data
+#    networks:
+#      - ollama-net
+  langflow-init:
+    image: alpine
+    container_name: langflow-init
+    command: chown -R 1000:0 /app/data
+    volumes:
+      - langflow-data:/app/data
+#      - ./langflow/data:/app/data
+  langflow:
+    image: langflowai/langflow:latest
+    container_name: langflow
+    depends_on:
+      langflow-init:
+        condition: service_completed_successfully
     ports:
-      - "8123:8123"
+      - "7860:7860"
     environment:
-      - LANGCHAIN_TRACING_V2=false
-      - LANGGRAPH_DATABASE_URL=sqlite:////app/data/langgraph.db
-      # agent 毎に使用変数が異なる
+      - LANGFLOW_DATABASE_URL=sqlite:////app/data/langflow.db
+      - LANGFLOW_AUTO_LOGIN=True
+      - LANGFLOW_SUPERUSER=root
+      - LANGFLOW_SUPERUSER_PASSWORD=root
+
+      # コンテナ作成の都度、Langflow API Keys を再作成の手間を省く
+      - LANGFLOW_API_KEY_SOURCE=env
+      - LANGFLOW_API_KEY=${__LANGFLOW_API_KEY}
+      - LANGFLOW_LOAD_FLOWS_PATH=/app/flows
+      - LANGFLOW_SKIP_AUTH_AUTO_LOGIN=true
+
       - OPENAI_API_KEY=${__OPENAI_API_KEY}
       - GEMINI_API_KEY=${__GEMINI_API_KEY}
       - ANTHROPIC_API_KEY=${__ANTHROPIC_API_KEY}
-      - LANGCHAIN_API_KEY=${__LANGCHAIN_API_KEY}
-      - LANGSMITH_API_KEY=${__LANGSMITH_API_KEY}
+
+
+#      - LANGCHAIN_API_KEY=${__LANGCHAIN_API_KEY}
+#      - LANGSMITH_API_KEY=${__LANGSMITH_API_KEY}
     volumes:
-      - ./langgraph:/app
-      - langgraph-data:/app/data
+      - langflow-data:/app/data
+#      - ./langflow/data:/app/data
+      - ./langflow/agents:/app/flows
     networks:
       - ollama-net
+#  langflow-cleanup:
+#    build:
+#      context: ./langflow/cleanup
+#    container_name: langflow-cleanup
+#    environment:
+#      - LANGFLOW_API_KEY=${__LANGFLOW_API_KEY}
+#    depends_on:
+#      - langflow
+#    networks:
+#      - ollama-net
+#    restart: always
   ollama-base:
     image: ollama/ollama:latest
     container_name: ollama-base
     environment:
       - TZ=Asia/Tokyo
+      - OLLAMA_KEEP_ALIVE=24h
       - __OLLAMA_MODEL=${__OLLAMA_MODEL}
     ports:
       - "11434:11434"
@@ -87,4 +139,5 @@ networks:
     driver: bridge
 volumes:
   open-webui:
-  langgraph-data:
+#  langgraph-data:
+  langflow-data:
