@@ -2,7 +2,7 @@ import asyncio
 import os
 import requests
 import time
-from utils.input_timer import InputTimer
+from langflow.utils.input_write_timer import InputWriteTimer
 
 BASE_URL = "http://localhost:8123"
 USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("true", "1", "yes")
@@ -10,7 +10,7 @@ USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("true", "1", "yes")
 async def test_string_input():
     print("\n================================================================================")
     # user_text = input("[Request] Enter payload for agent : ") or "is test."
-    user_text = await InputTimer.ask("[Request] Enter payload for agent : ", timeout=20)
+    user_text = await InputWriteTimer.ask("[Request] Enter payload for agent : ", timeout=20)
     print("================================================================================\n")
 
     try:

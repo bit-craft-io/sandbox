@@ -8,7 +8,7 @@ import pygame
 import requests
 import speech_recognition as sr
 
-from utils.suppress_stderr import SuppressStderr
+from langflow.utils.suppress_stderr import SuppressStderr
 
 BASE_URL = "http://localhost:8123"
 USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("true", "1", "yes")
