@@ -1,17 +1,28 @@
-include ../Makefile
 include .env
+THIS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+include $(THIS_DIR)../Makefile
 
 export OLLAMA_MODELS = $(HOME)/.ollama/models
 export COMFY_MODELS = $(HOME)/.comfyui/models
 #export SDXL_URL = https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/$(__COMFY_UI_MODEL)
 
+# ========================================
+# menu
+# ----------------------------------------
 TASKS += \
-	srv-setup \
-	srv-info \
-	srv-clean
-
-.PHONY: srv-setup
-srv-setup:
+	wsl-setup \
+	wsl-info \
+	wsl-clean \
+	dc-restart \
+	dc-up \
+	dc-down \
+	dc-clean \
+	dc-build
+# ========================================
+# wsl
+# ----------------------------------------
+.PHONY: wsl-setup
+wsl-setup:
 	@echo "--- Install Ollama ---"
 	@which ollama > /dev/null 2>&1 || (sudo apt-get install -y zstd && curl -fsSL https://ollama.com/install.sh | sh)
 	sudo systemctl stop ollama 2>/dev/null || true
@@ -28,8 +39,8 @@ srv-setup:
 #	mkdir -p $(COMFY_MODELS)/checkpoints
 #	wget -nc -P $(COMFY_MODELS)/checkpoints $(SDXL_URL)
 
-.PHONY: srv-info
-srv-info:
+.PHONY: wsl-info
+wsl-info:
 	@echo "--- LLM models ---"
 	@pgrep ollama > /dev/null 2>&1 || (ollama serve > /dev/null 2>&1 &)
 	@sleep 3
@@ -38,12 +49,13 @@ srv-info:
 #	@echo "--- Image models ---"
 #	@ls -lh ~/.comfyui/models/checkpoints/ 2>/dev/null || echo "No image models found"
 
-.PHONY: srv-clean
-srv-clean:
+.PHONY: wsl-clean
+wsl-clean:
 	@echo "--- Cleaning up Ollama processes ---"
 	@pgrep ollama > /dev/null 2>&1 || (echo "Starting ollama for cleanup..."; ollama serve > /dev/null 2>&1 & sleep 2)
 
 	@echo "--- Deleting all Ollama models EXCEPT $(__OLLAMA_MODEL) ---"
+	@sudo chown -R $$(whoami):$$(whoami) /home/guest/.ollama 2>/dev/null || true
 	@if which ollama > /dev/null 2>&1; then \
 		echo "Fetching downloaded models..."; \
 		for model in $$(ollama list | tail -n +2 | awk '{print $$1}'); do \
@@ -69,3 +81,26 @@ srv-clean:
 
 	@echo "--- Stopping Ollama process ---"
 	@pgrep ollama > /dev/null 2>&1 && pkill ollama || true
+
+# ========================================
+# docker
+# ----------------------------------------
+.PHONY: dc-restart
+dc-restart:
+	docker compose restart
+
+.PHONY: dc-up
+dc-up:
+	docker compose up -d
+
+.PHONY: dc-down
+dc-down:
+	docker compose down
+
+.PHONY: dc-clean
+dc-clean:
+	docker compose down -v
+
+.PHONY: dc-build
+dc-build:
+	docker compose up -d --build

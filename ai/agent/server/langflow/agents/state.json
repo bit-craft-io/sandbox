@@ -7,7 +7,7 @@
         "data": {
           "sourceHandle": {
             "dataType": "GetStaminaComponent",
-            "id": "CustomComponent-Ph4pE",
+            "id": "CustomComponent-4ysdP",
             "name": "message",
             "output_types": [
               "Message"
@@ -26,12 +26,40 @@
             "type": "other"
           }
         },
-        "id": "xy-edge__CustomComponent-Ph4pE{œdataTypeœ:œGetStaminaComponentœ,œidœ:œCustomComponent-Ph4pEœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-z90NZ{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-z90NZœ,œinputTypesœ:[œDataœ,œJSONœ,œDataFrameœ,œTableœ,œMessageœ],œtypeœ:œotherœ}",
+        "id": "xy-edge__CustomComponent-4ysdP{œdataTypeœ:œGetStaminaComponentœ,œidœ:œCustomComponent-4ysdPœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-z90NZ{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-z90NZœ,œinputTypesœ:[œDataœ,œJSONœ,œDataFrameœ,œTableœ,œMessageœ],œtypeœ:œotherœ}",
         "selected": false,
-        "source": "CustomComponent-Ph4pE",
-        "sourceHandle": "{œdataTypeœ:œGetStaminaComponentœ,œidœ:œCustomComponent-Ph4pEœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
+        "source": "CustomComponent-4ysdP",
+        "sourceHandle": "{œdataTypeœ:œGetStaminaComponentœ,œidœ:œCustomComponent-4ysdPœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
         "target": "ChatOutput-z90NZ",
         "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-z90NZœ,œinputTypesœ:[œDataœ,œJSONœ,œDataFrameœ,œTableœ,œMessageœ],œtypeœ:œotherœ}"
+      },
+      {
+        "animated": false,
+        "className": "",
+        "data": {
+          "sourceHandle": {
+            "dataType": "RecoverStaminaComponent",
+            "id": "CustomComponent-Ph4pE",
+            "name": "stamina_data",
+            "output_types": [
+              "Message"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "stamina_data",
+            "id": "CustomComponent-4ysdP",
+            "inputTypes": [
+              "Message"
+            ],
+            "type": "str"
+          }
+        },
+        "id": "xy-edge__CustomComponent-Ph4pE{œdataTypeœ:œRecoverStaminaComponentœ,œidœ:œCustomComponent-Ph4pEœ,œnameœ:œstamina_dataœ,œoutput_typesœ:[œMessageœ]}-CustomComponent-4ysdP{œfieldNameœ:œstamina_dataœ,œidœ:œCustomComponent-4ysdPœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "selected": false,
+        "source": "CustomComponent-Ph4pE",
+        "sourceHandle": "{œdataTypeœ:œRecoverStaminaComponentœ,œidœ:œCustomComponent-Ph4pEœ,œnameœ:œstamina_dataœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "CustomComponent-4ysdP",
+        "targetHandle": "{œfieldNameœ:œstamina_dataœ,œidœ:œCustomComponent-4ysdPœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
       }
     ],
     "nodes": [
@@ -313,8 +341,8 @@
           "width": 192
         },
         "position": {
-          "x": 2323.2855902667875,
-          "y": 731.051174076882
+          "x": 2412.01008520082,
+          "y": 669.6265237379363
         },
         "selected": false,
         "type": "genericNode"
@@ -329,8 +357,8 @@
             "beta": false,
             "conditional_paths": [],
             "custom_fields": {},
-            "description": "共通のスタミナファイルを読み込んで現在の値を返す",
-            "display_name": "Get Stamina Component",
+            "description": "経過時間分のスタミナ回復を計算・反映する",
+            "display_name": "Recover Stamina Component",
             "documentation": "",
             "edited": true,
             "field_order": [],
@@ -338,7 +366,102 @@
             "icon": "battery",
             "legacy": false,
             "metadata": {
-              "code_hash": "e39f30ff0de6",
+              "code_hash": "2128c68bfce8",
+              "dependencies": {
+                "dependencies": [
+                  {
+                    "name": "langflow",
+                    "version": "1.10.2"
+                  }
+                ],
+                "total_dependencies": 1
+              },
+              "module": "custom_components.recover_stamina_component"
+            },
+            "minimized": false,
+            "output_types": [],
+            "outputs": [
+              {
+                "allows_loop": false,
+                "cache": true,
+                "display_name": "Stamina Data",
+                "group_outputs": false,
+                "hidden": null,
+                "loop_types": null,
+                "method": "recover",
+                "name": "stamina_data",
+                "options": null,
+                "required_inputs": null,
+                "selected": "Message",
+                "tool_mode": true,
+                "types": [
+                  "Message"
+                ],
+                "value": "__UNDEFINED__"
+              }
+            ],
+            "pinned": false,
+            "template": {
+              "_type": "Component",
+              "code": {
+                "advanced": true,
+                "dynamic": true,
+                "fileTypes": [],
+                "file_path": "",
+                "info": "",
+                "list": false,
+                "load_from_db": false,
+                "multiline": true,
+                "name": "code",
+                "password": false,
+                "placeholder": "",
+                "required": true,
+                "show": true,
+                "title_case": false,
+                "type": "code",
+                "value": "import json\r\nimport os\r\nimport time\r\nfrom langflow.custom import Component\r\nfrom langflow.io import Output\r\nfrom langflow.schema.message import Message\r\n\r\nSTAMINA_FILE = \"/app/data/stamina.json\"\r\nMAX_STAMINA = 100\r\nRECOVERY_INTERVAL_SEC = 60\r\nRECOVERY_AMOUNT = 1\r\n\r\nclass RecoverStaminaComponent(Component):\r\n    display_name = \"Recover Stamina Component\"\r\n    description = \"経過時間分のスタミナ回復を計算・反映する\"\r\n    icon = \"battery\"\r\n\r\n    inputs = []\r\n\r\n    outputs = [\r\n        Output(display_name=\"Stamina Data\", name=\"stamina_data\", method=\"recover\"),\r\n    ]\r\n\r\n    def recover(self) -> Message:\r\n        now = time.time()\r\n\r\n        if not os.path.exists(STAMINA_FILE):\r\n            data = {\"current\": MAX_STAMINA, \"max\": MAX_STAMINA, \"last_updated\": now}\r\n            with open(STAMINA_FILE, \"w\") as f:\r\n                json.dump(data, f)\r\n            return Message(text=json.dumps(data, ensure_ascii=False))\r\n\r\n        with open(STAMINA_FILE, \"r\") as f:\r\n            data = json.load(f)\r\n\r\n        last_updated = data.get(\"last_updated\", now)\r\n        elapsed = now - last_updated\r\n\r\n        if elapsed >= RECOVERY_INTERVAL_SEC and data[\"current\"] < data[\"max\"]:\r\n            recovered_ticks = int(elapsed // RECOVERY_INTERVAL_SEC)\r\n            data[\"current\"] = min(data[\"max\"], data[\"current\"] + recovered_ticks * RECOVERY_AMOUNT)\r\n            data[\"last_updated\"] = last_updated + (recovered_ticks * RECOVERY_INTERVAL_SEC)\r\n            with open(STAMINA_FILE, \"w\") as f:\r\n                json.dump(data, f)\r\n\r\n        return Message(text=json.dumps(data, ensure_ascii=False))"
+              }
+            },
+            "tool_mode": false
+          },
+          "showNode": true,
+          "type": "RecoverStaminaComponent"
+        },
+        "dragging": false,
+        "id": "CustomComponent-Ph4pE",
+        "measured": {
+          "height": 124,
+          "width": 320
+        },
+        "position": {
+          "x": 1685.6597024043376,
+          "y": 520.951132429308
+        },
+        "selected": false,
+        "type": "genericNode"
+      },
+      {
+        "data": {
+          "id": "CustomComponent-4ysdP",
+          "node": {
+            "base_classes": [
+              "Message"
+            ],
+            "beta": false,
+            "conditional_paths": [],
+            "custom_fields": {},
+            "description": "前段から受け取ったスタミナ値を整形して返す",
+            "display_name": "Get Stamina Component",
+            "documentation": "",
+            "edited": true,
+            "field_order": [
+              "stamina_data"
+            ],
+            "frozen": false,
+            "icon": "battery",
+            "legacy": false,
+            "metadata": {
+              "code_hash": "eef996cd8876",
               "dependencies": {
                 "dependencies": [
                   {
@@ -391,7 +514,32 @@
                 "show": true,
                 "title_case": false,
                 "type": "code",
-                "value": "import json\r\nimport os\r\nfrom langflow.custom import Component\r\nfrom langflow.io import Output\r\nfrom langflow.schema.message import Message\r\n\r\nSTAMINA_FILE = \"/app/data/stamina.json\"\r\nDEFAULT_STAMINA = {\"current\": 100, \"max\": 100}\r\n\r\nclass GetStaminaComponent(Component):\r\n    display_name = \"Get Stamina Component\"\r\n    description = \"共通のスタミナファイルを読み込んで現在の値を返す\"\r\n    icon = \"battery\"\r\n\r\n    inputs = []\r\n\r\n    outputs = [\r\n        Output(display_name=\"Message\", name=\"message\", method=\"get_stamina\"),\r\n    ]\r\n\r\n    def get_stamina(self) -> Message:\r\n        if not os.path.exists(STAMINA_FILE):\r\n            with open(STAMINA_FILE, \"w\") as f:\r\n                json.dump(DEFAULT_STAMINA, f)\r\n\r\n        with open(STAMINA_FILE, \"r\") as f:\r\n            stamina_data = json.load(f)\r\n\r\n        # text = f\"現在のスタミナ: {stamina_data['current']}/{stamina_data['max']}\"\r\n        result = {\r\n            \"stamina\": {\r\n                \"current\": stamina_data[\"current\"],\r\n                \"max\": stamina_data[\"max\"],\r\n            }\r\n        }\r\n        text = json.dumps(result, ensure_ascii=False)\r\n        return Message(text=text)"
+                "value": "import json\r\nfrom langflow.custom import Component\r\nfrom langflow.io import MessageTextInput, Output\r\nfrom langflow.schema.message import Message\r\n\r\nDEFAULT_STAMINA = {\"current\": 100, \"max\": 100}\r\n\r\nclass GetStaminaComponent(Component):\r\n    display_name = \"Get Stamina Component\"\r\n    description = \"前段から受け取ったスタミナ値を整形して返す\"\r\n    icon = \"battery\"\r\n\r\n    inputs = [\r\n        MessageTextInput(\r\n            name=\"stamina_data\",\r\n            display_name=\"Stamina Data\",\r\n            info=\"前段(Recover Stamina Component)からのJSON文字列\",\r\n        ),\r\n    ]\r\n\r\n    outputs = [\r\n        Output(display_name=\"Message\", name=\"message\", method=\"get_stamina\"),\r\n    ]\r\n\r\n    def get_stamina(self) -> Message:\r\n        try:\r\n            data = json.loads(self.stamina_data)\r\n            current = data[\"current\"]\r\n            max_val = data[\"max\"]\r\n        except (json.JSONDecodeError, KeyError, TypeError):\r\n            # 前段未接続・空文字・不正な値の場合のデフォルト\r\n            current = DEFAULT_STAMINA[\"current\"]\r\n            max_val = DEFAULT_STAMINA[\"max\"]\r\n\r\n        result = {\"stamina\": {\"current\": current, \"max\": max_val}}\r\n        return Message(text=json.dumps(result, ensure_ascii=False))"
+              },
+              "stamina_data": {
+                "_input_type": "MessageTextInput",
+                "advanced": false,
+                "display_name": "Stamina Data",
+                "dynamic": false,
+                "info": "前段(Recover Stamina Component)からのJSON文字列",
+                "input_types": [
+                  "Message"
+                ],
+                "list": false,
+                "list_add_label": "Add More",
+                "load_from_db": false,
+                "name": "stamina_data",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": ""
               }
             },
             "tool_mode": false
@@ -400,23 +548,23 @@
           "type": "GetStaminaComponent"
         },
         "dragging": false,
-        "id": "CustomComponent-Ph4pE",
+        "id": "CustomComponent-4ysdP",
         "measured": {
-          "height": 124,
+          "height": 206,
           "width": 320
         },
         "position": {
-          "x": 1776.9321510543632,
-          "y": 648.0581360627472
+          "x": 2053.3724612086025,
+          "y": 486.81579835733396
         },
-        "selected": true,
+        "selected": false,
         "type": "genericNode"
       }
     ],
     "viewport": {
-      "x": -2692.353848894669,
-      "y": -783.2374683882665,
-      "zoom": 1.546684743851307
+      "x": -2039.1752901804607,
+      "y": -427.8696066801949,
+      "zoom": 1.243534081754808
     }
   },
   "description": "Powerful Prompts, Perfectly Positioned.",

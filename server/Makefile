@@ -204,4 +204,4 @@ endif
 #%:
 #	@:
 .DEFAULT:
-	@echo "--- [WARN] target '$@' unknown ---"
+	@echo "[WARN] target '$@' unknown"
