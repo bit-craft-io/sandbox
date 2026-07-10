@@ -9,6 +9,7 @@ import time
 from utils.session_manager import SessionManager
 from utils.input_write_timer import InputWriteTimer
 from utils.input_speak_timer import InputSpeakTimer
+from utils.voicevox.output_speak import OutputSpeak
 
 BASE_URL = "http://localhost:7860"
 API_KEY = os.environ.get("LANGFLOW_API_KEY", "")
@@ -19,7 +20,7 @@ USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("true", "1", "yes")
 IS_MONITORING = True
 
 session_mgr = SessionManager(timeout=60.0)
-
+output_speak = OutputSpeak(speed=1.5)
 
 async def _monitor_agent_status(status_context: dict, interval_seconds: float = 5.0):
     """裏でn秒毎にAgentの状態を問い合わせ続けるバックグラウンドタスク"""
@@ -124,6 +125,7 @@ def query_agent(user_text: str | None):
         return None
 
     if message_text:
+        output_speak.stream("テスト")
         print("\n================================================================================")
         print(f"[Response]: {message_text}")
         print("================================================================================\n")
@@ -167,7 +169,9 @@ async def main():
             user_text = await input_write.ask("[Request] Enter payload for agent : ")
             # TODO 20260709
             # await input_speak.ask("[Request] Enter payload for agent : ")
-            query_agent(user_text)
+            #query_agent(user_text)
+            await loop.run_in_executor(None, query_agent, user_text)
+
 
             print()
             # 再開
@@ -183,6 +187,19 @@ async def main():
 
 
 if __name__ == "__main__":
+
+    text = "はじめまして、ずんだもんです。\n"
+    # text += "説明、割愛\n"
+    # text += "今からエージェントの待ち受け処理を始めます。\n"
+    # text += "エージェントに質問をすると、スタミナが減ります。\n"
+    # text += "スタミナは、時間の経過で回復します。\n"
+    # text += "スタミナ切れになったらエージェントは返答してくれません（これは、未実装）。\n"
+    # text += "\n"
+    # text += "エンターボタンを押すと入力の待ち受けになります。\n"
+    # text += "エージェントはローカルLLMから推論して返答してくれます。\n"
+
+    output_speak.stream(text)
+
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
