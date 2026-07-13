@@ -82,12 +82,21 @@ py-init:
 
 .PHONY: py-setup
 py-setup:
+	# 独立した Python 仮想環境（.venv）を作成
 	python3 -m venv .venv
-	$(VENV_PIP) install speechrecognition pyaudio pyttsx3 pygame requests
+	# 音声認識・再生・音声合成・HTTPリクエスト用
+	$(VENV_PIP) install speechrecognition pyaudio pyttsx3 requests
+	# マルチメディアアプリ開発様（効果音・BGM再生に使用）
+	$(VENV_PIP) install pygame
+	# LangGraph（AIエージェントのグラフ構造制御）
 	$(VENV_PIP) install langgraph langchain-core langchain-openai
+	# CUI（ターミナル上の選択肢UI・1文字入力検知）
 	$(VENV_PIP) install inquirerpy readchar
+	# 高速ローカル音声認識（Whisper）・録音・音声判定・AI推論用
 	$(VENV_PIP) install faster-whisper sounddevice numpy silero-vad torch
+	# パッケージ管理・ビルド補助用
 	$(VENV_PIP) install setuptools
+	# Web API サーバー構築・起動用
 	$(VENV_PIP) install fastapi uvicorn
 
 .DEFAULT:

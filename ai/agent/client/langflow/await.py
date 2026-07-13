@@ -24,12 +24,16 @@ output_speak = OutputSpeak(speed=1.5)
 
 async def _monitor_agent_status(status_context: dict, interval_seconds: float = 5.0):
     """裏でn秒毎にAgentの状態を問い合わせ続けるバックグラウンドタスク"""
+    # loop = asyncio.get_running_loop()
     try:
         while True:
             if status_context.get("is_monitoring", True):
                 payload = _build_payload("", "")
                 headers = _build_headers()
                 final_state, elapsed_time = _call_flow_api(payload, headers, "state")
+                # final_state, elapsed_time = await loop.run_in_executor(
+                #     None, _call_flow_api, payload, headers, "state"
+                # )
 
                 #     try:
                 #   message_text = final_state["outputs"][0]["outputs"][0]["results"]["message"]["text"]
@@ -169,7 +173,7 @@ async def main():
             user_text = await input_write.ask("[Request] Enter payload for agent : ")
             # TODO 20260709
             # await input_speak.ask("[Request] Enter payload for agent : ")
-            #query_agent(user_text)
+            #await query_agent(user_text)
             await loop.run_in_executor(None, query_agent, user_text)
 
 
