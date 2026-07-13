@@ -137,11 +137,15 @@ dify-pull:
 
 .PHONY: dify-up
 dify-up:
-	docker compose -f ./dify/docker/docker-compose.yaml up -d
-
+	@if [ -f "dify/docker/docker-compose.yaml" ]; then \
+		docker compose -f ./dify/docker/docker-compose.yaml up -d; \
+	fi
 .PHONY: dify-clean
 dify-clean:
-	docker compose -f ./dify/docker/docker-compose.yaml down -v
+	@if [ -f "dify/docker/docker-compose.yaml" ]; then \
+		docker compose -f ./dify/docker/docker-compose.yaml down -v; \
+	fi
+	@rm -rf ./dify/.git
 	@GIT_DIR=$$(git rev-parse --git-common-dir); \
 	RELATIVE_PATH=$$(git rev-parse --show-prefix); \
 	EXCLUDE_LINE="$${RELATIVE_PATH}dify/"; \
