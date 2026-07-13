@@ -78,6 +78,7 @@ _exit:
 py-init:
 	sudo apt update
 	sudo apt install -y python3 python3-pip python3-venv
+	sudo apt install -y portaudio19-dev libpulse0
 
 .PHONY: py-setup
 py-setup:
@@ -87,6 +88,7 @@ py-setup:
 	$(VENV_PIP) install inquirerpy readchar
 	$(VENV_PIP) install faster-whisper sounddevice numpy silero-vad torch
 	$(VENV_PIP) install setuptools
+	$(VENV_PIP) install fastapi uvicorn
 
 .DEFAULT:
 	@echo "[WARN] target '$@' unknown"

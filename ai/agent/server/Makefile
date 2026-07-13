@@ -104,3 +104,31 @@ dc-clean:
 .PHONY: dc-build
 dc-build:
 	docker compose up -d --build
+
+.PHONY: dify-pull
+dify-pull:
+	@if [ ! -d "dify/.git" ]; then \
+		echo "repository clone dify"; \
+		rm -rf dify; \
+		git clone https://github.com/langgenius/dify.git dify; \
+		touch dify/.gitkeep; \
+		GIT_DIR=$$(git rev-parse --git-common-dir); \
+		RELATIVE_PATH=$$(git rev-parse --show-prefix); \
+		EXCLUDE_LINE="$${RELATIVE_PATH}dify/"; \
+		if [ -f "$$GIT_DIR/info/exclude" ]; then \
+			if ! grep -q "^$$EXCLUDE_LINE" "$$GIT_DIR/info/exclude"; then \
+				echo "$$EXCLUDE_LINE" >> "$$GIT_DIR/info/exclude"; \
+				echo "added $$EXCLUDE_LINE to .git/info/exclude"; \
+			fi \
+		fi \
+	else \
+		echo "exist dify clone skip"; \
+	fi
+	@if [ -d "dify/docker" ]; then \
+		if [ ! -f "dify/docker/.env" ]; then \
+			echo "make .env from .env.example"; \
+			cp dify/docker/.env.example dify/docker/.env; \
+		else \
+			echo "exist dify make skip"; \
+		fi \
+	fi
