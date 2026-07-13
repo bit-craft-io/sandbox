@@ -128,7 +128,26 @@ dify-pull:
 		if [ ! -f "dify/docker/.env" ]; then \
 			echo "make .env from .env.example"; \
 			cp dify/docker/.env.example dify/docker/.env; \
+			echo "make .env from .env.example with custom project name"; \
+			echo "COMPOSE_PROJECT_NAME=dify" >> dify/docker/.env; \
 		else \
 			echo "exist dify make skip"; \
+		fi \
+	fi
+
+.PHONY: dify-up
+dify-up:
+	docker compose -f ./dify/docker/docker-compose.yaml up -d
+
+.PHONY: dify-clean
+dify-clean:
+	docker compose -f ./dify/docker/docker-compose.yaml down -v
+	@GIT_DIR=$$(git rev-parse --git-common-dir); \
+	RELATIVE_PATH=$$(git rev-parse --show-prefix); \
+	EXCLUDE_LINE="$${RELATIVE_PATH}dify/"; \
+	if [ -f "$$GIT_DIR/info/exclude" ]; then \
+		if grep -q "^$$EXCLUDE_LINE" "$$GIT_DIR/info/exclude"; then \
+			sed -i '' "\|^$$EXCLUDE_LINE|d" "$$GIT_DIR/info/exclude" 2>/dev/null || sed -i "\|^$$EXCLUDE_LINE|d" "$$GIT_DIR/info/exclude"; \
+			echo "removed $$EXCLUDE_LINE from .git/info/exclude"; \
 		fi \
 	fi
