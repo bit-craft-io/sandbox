@@ -1,3 +1,6 @@
+include:
+  - path: ./dify/docker/docker-compose.yaml
+
 services:
   voicevox:
     image: voicevox/voicevox_engine:cpu-latest
