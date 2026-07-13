@@ -53,9 +53,9 @@ class Pipeline:
     def _produce(self):
         while True:
             text = self.text_queue.get()
-            if text is None:  # 終了シグナル
+            if text is None:  # バッチ終端シグナル（スレッドは終了しない）
                 self.audio_queue.put(None)
-                break
+                continue
             print(f"[Synthesizing] {text}")
             audio_bytes = _synthesize(text, self.speed)
             self.audio_queue.put(audio_bytes)
