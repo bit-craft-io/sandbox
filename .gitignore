@@ -8,3 +8,4 @@ ai/agent/server/langgraph/.langgraph_api
 ai/agent/server/langflow/data
 ai/.envrc
 ai/rag/.history
+ai/platform/dify/.git
