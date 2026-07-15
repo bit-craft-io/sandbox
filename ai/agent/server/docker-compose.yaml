@@ -1,6 +1,3 @@
-#include:
-#  - path: ./dify/docker/docker-compose.yaml
-
 services:
   voicevox:
     image: voicevox/voicevox_engine:cpu-latest
@@ -59,8 +56,6 @@ services:
       - OPENAI_API_KEY=${__OPENAI_API_KEY}
       - GEMINI_API_KEY=${__GEMINI_API_KEY}
       - ANTHROPIC_API_KEY=${__ANTHROPIC_API_KEY}
-
-
     #      - LANGCHAIN_API_KEY=${__LANGCHAIN_API_KEY}
     #      - LANGSMITH_API_KEY=${__LANGSMITH_API_KEY}
     volumes:
