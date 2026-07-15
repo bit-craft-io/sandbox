@@ -28,5 +28,5 @@ source .venv/bin/activate
 ### 疎通確認
 ```
 cd ./client/langflow
-make make cli-await
+make cli-await
 ```

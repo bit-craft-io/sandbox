@@ -1,0 +1,55 @@
+services:
+  voicevox:
+    image: voicevox/voicevox_engine:cpu-latest
+    ports:
+      - "50021:50021"
+    networks:
+      - dify_default
+  ollama-base:
+    image: ollama/ollama:latest
+    container_name: ollama-base
+    environment:
+      - TZ=Asia/Tokyo
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_CONTEXT_LENGTH=32768
+      - __OLLAMA_MODEL=${__OLLAMA_MODEL}
+    ports:
+      - "11434:11434"
+    volumes:
+      - ~/.ollama:/root/.ollama
+      - ./ollama/entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: always
+    networks:
+      - dify_default
+  ollama-proxy:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: ollama-proxy
+    ports:
+      - "4000:4000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      # 同じDockerネットワーク内に入ればホスト経由じゃなく、コンテナ名で直接呼べるようになるや、シランケド
+      - OLLAMA_API_BASE=http://ollama-base:11434
+    command: --model ollama_chat/${__OLLAMA_MODEL} --alias ${__OLLAMA_MODEL} --port 4000
+    restart: always
+    networks:
+      - dify_default
+
+networks:
+  # ここを外部のDify側のネットワークを指すように定義するんや、シランケド
+  dify_default:
+    name: sandbox_default
+    external: true
+
+volumes:
+  open-webui:
+  langflow-data:
