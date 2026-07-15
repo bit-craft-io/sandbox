@@ -11,6 +11,7 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_CONTEXT_LENGTH=32768
       - __OLLAMA_MODEL=${__OLLAMA_MODEL}
     ports:
       - "11434:11434"
@@ -36,15 +37,19 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - OLLAMA_API_BASE=http://host.docker.internal:11434
+      # 同じDockerネットワーク内に入ればホスト経由じゃなく、コンテナ名で直接呼べるようになるや、シランケド
+      - OLLAMA_API_BASE=http://ollama-base:11434
     command: --model ollama_chat/${__OLLAMA_MODEL} --alias ${__OLLAMA_MODEL} --port 4000
     restart: always
     networks:
       - dify_default
+
 networks:
+  # ここを外部のDify側のネットワークを指すように定義するんや、シランケド
   dify_default:
-    driver: bridge
+    name: sandbox_default
+    external: true
+
 volumes:
   open-webui:
-  #  langgraph-data:
   langflow-data:
