@@ -8,7 +8,6 @@ ai/agent/server/langgraph/.langgraph_api
 ai/agent/server/langflow/data
 ai/.envrc
 ai/rag/.history
-ai/platform/.env
 ai/platform/.venv
 ai/platform/dify
 ai/platform/backup/history/
