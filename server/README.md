@@ -9,7 +9,7 @@ wget https://go.dev/dl/go1.26.3.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go
 sudo tar -C /usr/local -xzf go1.26.3.linux-amd64.tar.gz
 
-echo '# add 2026.05.27 golang' >> ~/.bashrc
+echo "# add $(date +'%Y.%m.%d') golang" >> ~/.bashrc
 echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 

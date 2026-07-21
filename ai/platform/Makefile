@@ -287,6 +287,7 @@ dify-restore-all:
 .PHONY: dify-backup-list
 dify-backup-list:
 	@ls -1 $(HISTORY_ROOT)/ 2>/dev/null || echo "no history backups"
+	@echo $(HISTORY_ROOT)
 
 # 7日以上前の世代を削除（history配下のみ、backup/直下とlatestは維持）
 .PHONY: dify-backup-clean
