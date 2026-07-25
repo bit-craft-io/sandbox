@@ -1,4 +1,3 @@
-<style>pre {margin: 6px !important;padding: 6px 8px !important;}</style>
 ## 疎通確認
 - WSLで実行
 
