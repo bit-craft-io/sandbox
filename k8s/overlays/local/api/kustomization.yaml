@@ -18,9 +18,12 @@ patches:
       kind: Service
       name: svc-api
     patch: |
-      - op: replace
-        path: /spec/ports
-        value:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: svc-api
+      spec:
+        ports:
           - name: http
             protocol: TCP
             port: 8080
@@ -30,11 +33,16 @@ patches:
       kind: Deployment
       name: deploy-api
     patch: |
-      - op: replace
-        path: /spec/template/spec/containers/0/imagePullPolicy
-        value: Always
-      - op: add
-        path: /spec/template/spec/containers/0/envFrom
-        value:
-          - configMapRef:
-              name: ${KUSTOMIZE_APP_NAME}-env
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: deploy-api
+      spec:
+        template:
+          spec:
+            containers:
+              - name: api
+                imagePullPolicy: Always
+                envFrom:
+                  - configMapRef:
+                      name: ${KUSTOMIZE_APP_NAME}-env

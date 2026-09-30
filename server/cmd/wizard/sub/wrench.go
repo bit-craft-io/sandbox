@@ -2,7 +2,6 @@ package sub
 
 import (
 	"bit-craft/cmd/wizard/core"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,65 +16,45 @@ var ignoreTables = map[string]struct{}{
 }
 
 func WrenchMenu() {
-	var retAction action
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewSelect[action]().
-				Title("Ent Operations").
-				Options(
-					huh.NewOption("Migrate New", migrateNew),
-					huh.NewOption("Migrate Apply (dry-run)", migrateApplyDryRun),
-					huh.NewOption("Migrate Apply", migrateApply),
-					huh.NewOption("Migrate Fetch", migrateFetch),
-					huh.NewOption("Migrate Split", migrateSplit),
-					huh.NewOption("Cancel", migrateCancel),
-				).
-				Value(&retAction),
-		),
-	)
-
-	if err := form.Run(); err != nil || retAction == migrateCancel {
-		fmt.Println("Spanner operation cancelled, ware!")
-		return
-	}
-
-	switch retAction {
-	case migrateNew:
-		core.ProcLog.Segment("migrate new")
-		runMigrateNew()
-		core.ProcLog.Line()
-	case migrateApplyDryRun:
-		core.ProcLog.Segment("migrate up dry-run")
-		var env *core.EmulatorSpannerEnv
-		var err error
-		env, err = core.EmulatorSpanner()
-		if err != nil {
-			return
+	runMenu("wrench", "Wrench Operations", []huh.Option[action]{
+		huh.NewOption("Migrate New", migrateNew),
+		huh.NewOption("Migrate Apply (dry-run)", migrateApplyDryRun),
+		huh.NewOption("Migrate Apply", migrateApply),
+		huh.NewOption("Migrate Fetch", migrateFetch),
+		huh.NewOption("Migrate Split", migrateSplit),
+		huh.NewOption("Cancel", migrateCancel),
+	}, migrateCancel, nil, func(ret action) {
+		switch ret {
+		case migrateNew:
+			core.ProcLog.Segment("migrate new")
+			runMigrateNew()
+			core.ProcLog.Line()
+		case migrateApplyDryRun:
+			core.ProcLog.Segment("migrate up dry-run")
+			env, err := core.EmulatorSpanner()
+			if err != nil {
+				return
+			}
+			defer env.Cleanup()
+			_ = os.Setenv("SPANNER_EMULATOR_HOST", env.Endpoint)
+			runMigrate("up")
+			core.ProcLog.Line()
+		case migrateApply:
+			core.ProcLog.Segment("migrate up")
+			runMigrate("up")
+			core.ProcLog.Line()
+		case migrateFetch:
+			core.ProcLog.Segment("migrate load")
+			runMigrate("load")
+			core.ProcLog.Line()
+		case migrateSplit:
+			core.ProcLog.Segment("schema.sql split")
+			runMigrateSplit()
+			core.ProcLog.Line()
+		default:
+			panic("unhandled default case")
 		}
-		defer env.Cleanup()
-		_ = os.Setenv("SPANNER_EMULATOR_HOST", env.Endpoint)
-		runMigrate("up")
-		core.ProcLog.Line()
-	case migrateApply:
-		core.ProcLog.Segment("migrate up")
-		runMigrate("up")
-		core.ProcLog.Line()
-	case migrateFetch:
-		core.ProcLog.Segment("migrate load")
-		runMigrate("load")
-		core.ProcLog.Line()
-	case migrateSplit:
-		core.ProcLog.Segment("schema.sql split")
-		runMigrateSplit()
-		core.ProcLog.Line()
-	default:
-		panic("unhandled default case")
-	}
-
-	// @note メニューを再帰呼び出し
-	if retAction != migrateCancel {
-		WrenchMenu()
-	}
+	})
 }
 
 func runMigrateNew() {
@@ -92,9 +71,7 @@ func runMigrateNew() {
 	}
 
 	cmd := exec.Command("make", "-s", "migrate-new", "NAME="+name)
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := core.RunAndLog(core.ProcLog, "migrate", cmd); err != nil {
 		core.ProcLog.Fatal("migrate", "new failed: %v", err)
 	}
 
@@ -102,27 +79,16 @@ func runMigrateNew() {
 }
 
 func runMigrate(target string) {
-	action := "migrate " + target
+	label := "migrate " + target
 
 	cmd := exec.Command("make", "-s", "migrate-"+target)
 	cmd.Env = os.Environ()
 
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		core.ProcLog.Info(action,
-			"Failed with error:\n%s\n\nCommand output:\n%s",
-			indentOutput(err.Error()),
-			indentOutput(string(output)),
-		)
+	if err := core.RunAndLog(core.ProcLog, label, cmd); err != nil {
 		return
 	}
 
-	outStr := strings.TrimSpace(string(output))
-	if len(outStr) > 0 {
-		core.ProcLog.Info(action, "%s", outStr)
-	}
-
-	core.ProcLog.Info(action, "successfully")
+	core.ProcLog.Info(label, "successfully")
 }
 
 func isIgnored(tableName string) bool {
@@ -166,12 +132,4 @@ func runMigrateSplit() {
 	_ = os.WriteFile(filepath.Join(outputDir, "index.sql"), []byte(strings.Join(indexStatements, "\n\n")), 0666)
 
 	core.ProcLog.Info("schema.sql split", "successfully")
-}
-
-func indentOutput(input string) string {
-	lines := strings.Split(input, "\n")
-	for i, line := range lines {
-		lines[i] = "  " + line
-	}
-	return strings.Join(lines, "\n")
 }

@@ -2,3 +2,32 @@ apiVersion: agones.dev/v1
 kind: Fleet
 metadata:
   name: my-go-server
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: game
+    spec:
+      ports:
+        - name: default
+          portPolicy: Dynamic
+          containerPort: 7654
+          protocol: UDP
+      health:
+        # TODO: server/cmd/app/game/main.go でAgones SDKのHealth()/Ready()を
+        # 実装するまでは無効化しておく（呼ばれないと落とされ続けるため）。
+        disabled: true
+      template:
+        spec:
+          containers:
+            - name: game
+              image: img-backend
+              imagePullPolicy: Always
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi

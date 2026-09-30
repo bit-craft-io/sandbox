@@ -10,33 +10,20 @@ import (
 )
 
 func AtlasMenu() {
-	var retAction action
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewSelect[action]().
-				Title("Atlas Operations").
-				Options(
-					huh.NewOption("Atlas Diff", atlasDiff),
-					huh.NewOption("Atlas Apply", atlasApply),
-					huh.NewOption("Cancel", atlasCancel),
-				).
-				Value(&retAction),
-		),
-	)
-
-	if err := form.Run(); err != nil || retAction == atlasCancel {
-		core.ProcLog.Info("atlas", "operation cancelled, ware!")
-		return
-	}
-
-	switch retAction {
-	case atlasDiff:
-		runAtlasDiff()
-	case atlasApply:
-		runAtlasApply()
-	default:
-		panic("unhandled default case")
-	}
+	runMenu("atlas", "Atlas Operations", []huh.Option[action]{
+		huh.NewOption("Atlas Diff", atlasDiff),
+		huh.NewOption("Atlas Apply", atlasApply),
+		huh.NewOption("Cancel", atlasCancel),
+	}, atlasCancel, nil, func(ret action) {
+		switch ret {
+		case atlasDiff:
+			runAtlasDiff()
+		case atlasApply:
+			runAtlasApply()
+		default:
+			panic("unhandled default case")
+		}
+	})
 }
 
 func runAtlasDiff() {
@@ -55,11 +42,10 @@ func runAtlasDiff() {
 	cmd := exec.Command("make", "-s", "atlas-diff",
 		"NAME="+name,
 	)
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := core.RunAndLog(core.ProcLog, "atlas", cmd); err != nil {
 		core.ProcLog.Fatal("atlas", "atlas diff failed: %v", err)
 	}
+
 	core.ProcLog.Info("atlas", "successfully")
 }
 
@@ -72,11 +58,10 @@ func runAtlasApply() {
 
 	cmd := exec.Command("make", "-s", "atlas-apply")
 	cmd.Env = append(os.Environ(), "DB_URL="+url)
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := core.RunAndLog(core.ProcLog, "atlas", cmd); err != nil {
 		core.ProcLog.Fatal("atlas", "atlas apply failed: %v", err)
 	}
+
 	core.ProcLog.Info("atlas", "apply successfully")
 }
 

@@ -19,51 +19,30 @@ var ignoreDDLs = map[string]struct{}{
 }
 
 func GormMenu() {
-	var retAction action
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewSelect[action]().
-				Title("Ent Operations").
-				Options(
-					huh.NewOption("Generate", gormGen),
-					huh.NewOption("Cancel", gormCancel),
-				).
-				Value(&retAction),
-		),
-	)
-
-	if err := form.Run(); err != nil || retAction == gormCancel {
-		core.ProcLog.Info("gorm", "operation cancelled, ware!")
-		return
-	}
-
-	switch retAction {
-	case gormGen:
-		core.ProcLog.Segment("generate sql to object")
-		runGormGen()
-		core.ProcLog.Line()
-	default:
-		panic("unhandled default case")
-	}
-
-	// @note メニューを再帰呼び出し
-	if retAction != gormCancel {
-		GormMenu()
-	}
+	runMenu("gorm", "Gorm Operations", []huh.Option[action]{
+		huh.NewOption("Generate", gormGen),
+		huh.NewOption("Cancel", gormCancel),
+	}, gormCancel, nil, func(ret action) {
+		switch ret {
+		case gormGen:
+			core.ProcLog.Segment("generate sql to object")
+			runGormGen()
+			core.ProcLog.Line()
+		default:
+			panic("unhandled default case")
+		}
+	})
 }
 
 func runGormGen() {
-	var env *core.EmulatorSpannerEnv
-	var err error
-	env, err = core.EmulatorSpanner()
+	env, err := core.EmulatorSpanner()
 	if err != nil {
 		return
 	}
 	defer env.Cleanup()
 
 	gormDb := mustGormDb(env.DSN)
-	err = applyDDL(gormDb)
-	if err != nil {
+	if err := applyDDL(gormDb); err != nil {
 		return
 	}
 
@@ -111,7 +90,6 @@ func runGormGen() {
 	}()
 
 	core.ProcLog.Info("end", "generate")
-	return
 }
 
 func mustGormDb(dsn string) *gorm.DB {
@@ -145,7 +123,6 @@ func applyDDL(db *gorm.DB) error {
 		}
 
 		if err := db.Exec(stmt).Error; err != nil {
-			// core.SchemaLog.Error("db.Exec", err)
 			core.SchemaLog.Fatal("db.Exec failed", "error %v\n statement %s", err, stmt)
 			return err
 		}

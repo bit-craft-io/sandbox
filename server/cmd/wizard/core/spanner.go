@@ -45,20 +45,22 @@ func EmulatorSpanner() (*EmulatorSpannerEnv, error) {
 		return nil, err
 	}
 
+	// @note 途中で失敗したらここまでで起動したコンテナを必ず片付ける。
+	// 最後まで成功したら ok=true にして呼び出し元の Cleanup() に委譲する。
+	ok := false
+	defer func() {
+		if !ok {
+			_ = container.Terminate(ctx)
+		}
+	}()
+
 	endpoint, err := container.PortEndpoint(ctx, "9010/tcp", "http")
 	if err != nil {
-		_ = container.Terminate(ctx)
 		return nil, err
 	}
 
 	emulatorHost := endpoint[7:]
 	_ = os.Setenv("SPANNER_EMULATOR_HOST", emulatorHost)
-	cleanup := func() {
-		if err := container.Terminate(ctx); err != nil {
-			SpannerLog.Fatal("container terminate", "terminate spanner\n %v")
-		}
-		SpannerLog.Info("cleanup", "terminate container")
-	}
 
 	newIns, err := instance.NewInstanceAdminClient(ctx)
 	if err != nil {
@@ -98,6 +100,14 @@ func EmulatorSpanner() (*EmulatorSpannerEnv, error) {
 		instanceID,
 		dbName,
 	)
+
+	ok = true
+	cleanup := func() {
+		if err := container.Terminate(ctx); err != nil {
+			SpannerLog.Fatal("container terminate", "terminate spanner\n %v", err)
+		}
+		SpannerLog.Info("cleanup", "terminate container")
+	}
 
 	return &EmulatorSpannerEnv{DSN: dsn, Endpoint: emulatorHost, Cleanup: cleanup}, nil
 }

@@ -8,43 +8,23 @@ import (
 )
 
 func EntMenu() {
-	var retAction action
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewSelect[action]().
-				Title("Ent Operations").
-				Options(
-					huh.NewOption("Ent Gen", entGen),
-					huh.NewOption("Ent Gen Remove", entGenRemove),
-					huh.NewOption("Ent New", entNew),
-					huh.NewOption("Cancel", entCancel),
-				).
-				Value(&retAction),
-		),
-	)
-
-	if err := form.Run(); err != nil || retAction == entCancel {
-		core.ProcLog.Info("ent", "operation cancelled, ware!")
-		return
-	}
-
-	switch retAction {
-	case entGen:
-		runEntGen()
-	case entGenRemove:
-		cmd := exec.Command("make", "-s", "ent-gen-clean")
-		//cmd.Stdout = os.Stdout
-		//cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
-			core.ProcLog.Error("ent", err)
-			return
+	runMenu("ent", "Ent Operations", []huh.Option[action]{
+		huh.NewOption("Ent Gen", entGen),
+		huh.NewOption("Ent Gen Remove", entGenRemove),
+		huh.NewOption("Ent New", entNew),
+		huh.NewOption("Cancel", entCancel),
+	}, entCancel, nil, func(ret action) {
+		switch ret {
+		case entGen:
+			runEntGen()
+		case entGenRemove:
+			runEntGenRemove()
+		case entNew:
+			runEntNew()
+		default:
+			panic("unhandled default case")
 		}
-		core.ProcLog.Info("ent", "remove successfully")
-	case entNew:
-		runEntNew()
-	default:
-		panic("unhandled default case")
-	}
+	})
 }
 
 func runEntNew() {
@@ -65,33 +45,38 @@ func runEntNew() {
 		"NAME="+name,
 		"SNAKE_NAME="+toSnake(name),
 	)
-
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := core.RunAndLog(core.ProcLog, "ent", cmd); err != nil {
 		core.ProcLog.Fatal("ent", "ent new failed: %v", err)
 	}
+
 	core.ProcLog.Info("ent", "successfully")
 }
 
 func runEntGen() {
 	cmd := exec.Command("make", "-s", "ent-gen")
-
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := core.RunAndLog(core.ProcLog, "ent", cmd); err != nil {
 		core.ProcLog.Fatal("ent", "generate failed: %v", err)
 	}
+
 	core.ProcLog.Info("ent", "generate successfully")
+}
+
+func runEntGenRemove() {
+	cmd := exec.Command("make", "-s", "ent-gen-clean")
+	if err := core.RunAndLog(core.ProcLog, "ent", cmd); err != nil {
+		return
+	}
+
+	core.ProcLog.Info("ent", "remove successfully")
 }
 
 func toSnake(s string) string {
 	var out []rune
 	for i, r := range s {
-		if i == 1 {
-			out = append(out, '_')
-		}
 		if 'A' <= r && r <= 'Z' {
+			if i > 0 {
+				out = append(out, '_')
+			}
 			r += 'a' - 'A'
 		}
 		out = append(out, r)

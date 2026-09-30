@@ -83,7 +83,7 @@ func selectDirectory(currentPath string) string {
 
 	err := form.Run()
 	if err != nil {
-		core.ProcLog.Fatal("config", "Error during directory selection: ", err)
+		core.ProcLog.Fatal("config", "Error during directory selection: %v", err)
 	}
 
 	switch value := selected.(type) {
@@ -134,12 +134,12 @@ func saveConfig(targetPath string) {
 
 	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		core.ProcLog.Fatal("config", "Failed to marshal config to JSON: ", err)
+		core.ProcLog.Fatal("config", "Failed to marshal config to JSON: %v", err)
 	}
 
 	err = os.WriteFile(configFilePath, data, 0644)
 	if err != nil {
-		core.ProcLog.Fatal("config", "Failed to write config file: ", err)
+		core.ProcLog.Fatal("config", "Failed to write config file: %v", err)
 	}
 
 	core.ProcLog.Info("config", "Configuration completed successfully!")

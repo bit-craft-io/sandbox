@@ -103,12 +103,8 @@ func installTool(toolType toolType) {
 		return
 	}
 
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
-	//cmd.Stdin = os.Stdin
 	core.ProcLog.Info("tool", "deploying %s...\n", toolType.cmd)
-	if err := cmd.Run(); err != nil {
-		core.ProcLog.Error("tool", err)
+	if err := core.RunAndLog(core.ProcLog, "tool", cmd); err != nil {
 		return
 	}
 	core.ProcLog.Info("tool", "%s synchronized successfully", toolType.cmd)

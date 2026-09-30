@@ -8,57 +8,32 @@ import (
 )
 
 func ProtoMenu() {
-	var retAction action
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewSelect[action]().
-				Title("Proto Operations").
-				Options(
-					huh.NewOption("Proto New", protoNew),
-					huh.NewOption("Proto Gen", protoGen),
-					huh.NewOption("Proto Gen Remove", protoGenRemove),
-					huh.NewOption("Cancel", protoCancel),
-				).
-				Value(&retAction),
-		),
-	)
-
-	if err := form.Run(); err != nil || retAction == protoCancel {
-		core.ProcLog.Info("proto", "operation cancelled, ware!")
-		return
-	}
-
-	switch retAction {
-	case protoNew:
-		core.ProcLog.Segment("create protobuf")
-		runProtoNew()
-		core.ProcLog.Line()
-	case protoGen:
-		core.ProcLog.Segment("generate protobuf")
-		runProtoGen()
-		core.ProcLog.Line()
-	case protoGenRemove:
-		core.ProcLog.Segment("remove protobuf")
-		cmd := exec.Command("make", "-s", "proto-gen-clean")
-		//cmd.Stdout = os.Stdout
-		//cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
-			core.ProcLog.Fatal("proto", "remove failed: %v", err)
+	runMenu("proto", "Proto Operations", []huh.Option[action]{
+		huh.NewOption("Proto New", protoNew),
+		huh.NewOption("Proto Gen", protoGen),
+		huh.NewOption("Proto Gen Remove", protoGenRemove),
+		huh.NewOption("Cancel", protoCancel),
+	}, protoCancel, nil, func(ret action) {
+		switch ret {
+		case protoNew:
+			core.ProcLog.Segment("create protobuf")
+			runProtoNew()
+			core.ProcLog.Line()
+		case protoGen:
+			core.ProcLog.Segment("generate protobuf")
+			runProtoGen()
+			core.ProcLog.Line()
+		case protoGenRemove:
+			core.ProcLog.Segment("remove protobuf")
+			runProtoGenRemove()
+			core.ProcLog.Line()
+		default:
+			panic("unhandled default case")
 		}
-		core.ProcLog.Info("proto", "remove successfully")
-		core.ProcLog.Line()
-	default:
-		panic("unhandled default case")
-	}
-
-	// @note メニューを再帰呼び出し
-	if retAction != protoCancel {
-		ProtoMenu()
-	}
+	})
 }
 
 func runProtoNew() {
-
 	var name string
 
 	_ = huh.NewInput().
@@ -73,9 +48,7 @@ func runProtoNew() {
 	}
 
 	cmd := exec.Command("make", "-s", "proto-new", "NAME="+name)
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := core.RunAndLog(core.ProcLog, "proto", cmd); err != nil {
 		core.ProcLog.Fatal("proto", "new failed: %v", err)
 	}
 
@@ -84,12 +57,18 @@ func runProtoNew() {
 
 func runProtoGen() {
 	cmd := exec.Command("make", "-s", "proto-gen")
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		core.ProcLog.Error("proto", err)
+	if err := core.RunAndLog(core.ProcLog, "proto", cmd); err != nil {
+		return
 	}
 
 	core.ProcLog.Info("proto", "generate successfully")
+}
+
+func runProtoGenRemove() {
+	cmd := exec.Command("make", "-s", "proto-gen-clean")
+	if err := core.RunAndLog(core.ProcLog, "proto", cmd); err != nil {
+		core.ProcLog.Fatal("proto", "remove failed: %v", err)
+	}
+
+	core.ProcLog.Info("proto", "remove successfully")
 }
